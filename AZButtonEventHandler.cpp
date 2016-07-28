@@ -10,6 +10,21 @@
 #include "mbed.h"
 #include "pinmap.h"
 #include "AZButtonEventHandler.h"
+#include "LED.h"
+
+#define tapTimeInterval 80
+#define holdTimeInterval 1500
+
+enum AZButtonPressType{
+    tap,  // 100 < time <=3000 ms, override with tapTimeInterval
+    hold,  // time > 3000 ms, override with holdTimeInterval
+    none
+};
+
+struct AZButtonResponse{
+    int count;
+    AZButtonPressType type;
+};
 
 InterruptIn button(P0_1);       // On-board button of Xadow M0
 
@@ -79,4 +94,32 @@ AZButtonResponse currentButtonResponse(){
     response.count = count;
     response.type = pressType;
     return response;
-}
+};
+
+void handleButtonResponse(){
+    AZButtonResponse response = currentButtonResponse();
+    if (response.count){
+        if (response.type == tap){
+            for (int i = 0; i < response.count; i++){
+                blueLED = 1;
+                wait(0.3);
+                blueLED = 0;
+                wait(0.2);
+            }
+        } else if (response.type == hold) {
+            if (response.count == 1){
+                blueLED = 1;
+                whiteLED = 1;
+                wait (1);
+                NVIC_SystemReset();
+            } else {
+                for (int i = 0; i < response.count; i++){
+                    whiteLED = 1;
+                    wait(0.3);
+                    whiteLED = 0;
+                    wait(0.2);
+                }  
+            }  
+        }
+    }
+};

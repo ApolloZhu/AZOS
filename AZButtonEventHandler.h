@@ -8,18 +8,5 @@
 
 #ifndef AZButtonEventHandler_H
 #define AZButtonEventHandler_H
-
-enum AZButtonPressType{
-    tap,  // 100 < time <=3000 ms, override with tapTimeInterval
-    hold,  // time > 3000 ms, override with holdTimeInterval
-    none
-};
-
-struct AZButtonResponse{
-    int count;
-    AZButtonPressType type;
-};
-
-AZButtonResponse currentButtonResponse();
-
+void handleButtonResponse();
 #endif
